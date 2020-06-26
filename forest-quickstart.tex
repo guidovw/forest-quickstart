@@ -177,7 +177,7 @@ for tree={s sep=10mm, inner sep=0, l=0}
 \end{forest}
 \end{lstlisting}
 
-\noindent The comma following the node label CP is an instruction to forest that whatever follows it is not part of the node label, but an instruction for typesetting, in this case to adjust the value for the \texttt{s sep} at this node. We will come across such commas on multiple occasions later on. This means your node labels must not contain commas.
+\noindent The comma following the node label CP is an instruction to forest that whatever follows it is not part of the node label, but an instruction for typesetting, in this case to adjust the value for the \texttt{s sep} at this node. We will come across such commas on multiple occasions later on. This means your node labels must be placed between \verb|{}| if they contain commas.
 
 \ex. \begin{forest}
 for tree={s sep=10mm, inner sep=0, l=0}
@@ -188,12 +188,12 @@ for tree={s sep=10mm, inner sep=0, l=0}
 ]
 \end{forest}
 
-In \Last, the daughters of the CP node get an increased horizontal spacing; the setting at the CP node overrides the global setting for the rest of the tree. You can also apply the setting to a subtree by applying the \texttt{for tree} command  to a particular node:
+In \Last, the daughters of the CP node get increased horizontal spacing; the setting at the CP node overrides the global setting for the rest of the tree. You can also apply the setting to a subtree by applying the \texttt{for tree} command  to a particular node:
 
 \begin{lstlisting}[basicstyle=\ttfamily,basewidth=0.5em]
 \ex. \begin{forest}
 for tree={s sep=10mm, inner sep=0, l=0}
-[CP 
+[CP
 	[C] 
 	[IP, for tree={s sep=20mm} 
 		[I] 
@@ -205,7 +205,7 @@ for tree={s sep=10mm, inner sep=0, l=0}
 
 \ex. \begin{forest}
 for tree={s sep=10mm, inner sep=0, l=0}
-[CP 
+[CP
 	[C] 
 	[IP, for tree={s sep=20mm} [I] 
 		[VP [V] [NP]] 
@@ -304,7 +304,7 @@ for tree={s sep=4mm, inner sep=0, l=0}
 
 \section{Unlabelled nodes}
 
-Sometimes you  want to leave  nodes in the tree unlabelled. Just leaving out these labels is fine as far as the forest syntax is concerned, but the result shows a rather annoying gap where the node label would normally be:
+Sometimes you  want to leave  nodes in the tree unlabelled. Just leaving out these labels is fine as far as the forest syntax is concerned, but the result shows a rather uncomfortable gap where the node label would normally be:
 
 \ex.
 \begin{forest}
@@ -316,7 +316,7 @@ for tree={s sep=4mm, inner sep=0, l=0}
 ]
 \end{forest}
 
-The solution is to define a style, which we call \texttt{fairly nice empty nodes}, and which is best put in the document preamble.
+The solution is to define a style, which is called \texttt{fairly nice empty nodes}, and which is best put in the document preamble.
 
 \begin{verbatim}
 \forestset{
