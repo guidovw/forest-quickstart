@@ -23,6 +23,8 @@ fairly nice empty nodes/.style={
               for siblings={anchor=north}}{}},
 		for tree={s sep=4mm}},
 }
+\usepackage{tikz}
+\usetikzlibrary{arrows}%load specific libraries for tikz
 \usepackage{linguex} %for linguistic example numbers
 \setlist{nolistsep} %reduce space between items in lists
 \renewcommand{\firstrefdash}{} %no dash in example references eg (3a) not (3-a)
@@ -97,7 +99,7 @@ One important caveat: be careful not to insert any empty lines in your code, as 
 	] 
 	[T$'$
 		[T [might] ] 
-		[AgrP [fill your tree]] 
+		[VP [fill your tree]] 
 	]
 ]
 \end{forest}
@@ -113,7 +115,7 @@ One important caveat: be careful not to insert any empty lines in your code, as 
 	] 
 	[T$'$
 		[T [might] ] 
-		[AgrP [fill your tree]] 
+		[VP [fill your tree ]] 
 	]
 ]
 \end{forest}
@@ -143,17 +145,16 @@ for tree={s sep=10mm, inner sep=0, l=0}
 \ex. \begin{forest}
 for tree={s sep=10mm, inner sep=0, l=0}
 [CP [C] 
-	[IP [I] 
+	[IP [I \\ {[\textsc{3sg}]} ]
 		[VP [V] [NP]  
 		] 
 	] 
 ]
 \end{forest}
 
-This tree has wider horizontal spacing, less level distance, and less empty space around the nodes than the tree in \ref{1}. 
+This tree has wider horizontal spacing, less level distance, and less empty space around the nodes than the tree in \ref{1}. Also notice how we can get square brackets in a tree, as in the [\textsc{3sg}] feature set under I. Normally, forest would interpret square brackets as instructions to create a new node, but by enclosing them between \verb|{}| they will appear in the output.
 
-If you like this way the tree looks, you might want to use these settings for all your trees. This can be done by adding the relevant settings to your preamble (following the \begin{verbatim}
-\usepackage[linguistics]{forest}\end{verbatim} command): 
+If you like this way the tree looks, you might want to use the \texttt{level}, \texttt{inner sep} and \texttt{s sep} settings for all your trees. This can be done by adding the relevant settings to your preamble (following the \verb|\usepackage[linguistics]{forest}| command): 
 
 \needspace{3\baselineskip}
 \begin{lstlisting}[basicstyle=\ttfamily,basewidth=0.5em]
@@ -162,8 +163,9 @@ default preamble={for tree={s sep=10mm, inner sep=0, l=0}
 }
 \end{lstlisting}
 
-The commands that adjust horizontal and vertical spacing can also be applied locally, either to a single node, or to all the nodes dominated by a node (i.e. a subtree). Applying the parameter to a single node is done by putting a comma after the node label and then issuing the relevant command.
+The commands that adjust horizontal and vertical spacing can also be applied locally, either to a single node, or to all the nodes dominated by a node (i.e. a subtree). Applying the parameter to a single node is done by putting a comma after the node label and then issuing the relevant command, as shown in \Next. 
 
+%\needspace{8\baselineskip}
 \begin{lstlisting}[basicstyle=\ttfamily,basewidth=0.5em]
 \ex. \begin{forest}
 for tree={s sep=10mm, inner sep=0, l=0}
@@ -174,6 +176,8 @@ for tree={s sep=10mm, inner sep=0, l=0}
 		[VP [V]]]]
 \end{forest}
 \end{lstlisting}
+
+\noindent The comma following the node label CP is an instruction to forest that whatever follows it is not part of the node label, but an instruction for typesetting, in this case to adjust the value for the \texttt{s sep} at this node. We will come across such commas on multiple occasions later on. This means your node labels must not contain commas.
 
 \ex. \begin{forest}
 for tree={s sep=10mm, inner sep=0, l=0}
@@ -213,7 +217,6 @@ Here increased horizontal distance has been applied to the subtree dominated by 
 
 In order to produce a slanted rather than a vertical line under a nonbranching node, you can insert a phantom node. A phantom node has no label; the \texttt{phantom} command tells \texttt{forest} not to draw a line to this phantom node, as in the example below. Without the phantom node, a vertical line would connect CP to IP: 
 
-\pagebreak
 \begin{lstlisting}[basicstyle=\ttfamily,basewidth=0.5em]
 \ex. \begin{forest}
 for tree={s sep=10mm, inner sep=0, l=0}
@@ -235,9 +238,11 @@ for tree={s sep=10mm, inner sep=0, l=0}
 ]
 \end{forest}
 
+The notation \texttt{[,phantom]} should be understood as follows: following the opening bracket, there is no node label. The instruction \texttt{phantom} following the comma tells forest to create an invisible branch as a sister to IP.  
+
 \section{Triangles}
 
-Triangles are easy to produce with the \texttt{roof} command, which you put before the closing bracket of the node that you want a triangle above.
+Triangles are easy to produce with the \texttt{roof} command, which you put following the node label of the node that you want a triangle above.
 
 \begin{lstlisting}[basicstyle=\ttfamily,basewidth=0.5em]
 \ex. \begin{forest}
@@ -284,7 +289,7 @@ for tree={s sep=10mm, inner sep=0, l=0}
 \end{lstlisting}
 
 \ex. \begin{forest}
-for tree={s sep=10mm, inner sep=0, l=0}
+for tree={s sep=4mm, inner sep=0, l=0}
 [CP 
 	[C] 
 	[IP
@@ -299,27 +304,53 @@ for tree={s sep=10mm, inner sep=0, l=0}
 
 \section{Unlabelled nodes}
 
-Sometimes you may want to leave nonterminal nodes in the tree unlabelled. Just leaving out these labels does not look pretty:
+Sometimes you  want to leave  nodes in the tree unlabelled. Just leaving out these labels is fine as far as the forest syntax is concerned, but the result shows a rather annoying gap where the node label would normally be:
 
+\ex.
 \begin{forest}
-[ [A] 
-	[ [B] 
-		[ [C]
-			[D]  
-		] 
-	] 
+for tree={s sep=4mm, inner sep=0, l=0}
+[[A] 
+	[[B] 
+		[[C][D]] 
+	]
 ]
 \end{forest}
 
-The solution is to define a style, which we shall call \texttt{fairly nice empty nodes}
+The solution is to define a style, which we call \texttt{fairly nice empty nodes}, and which is best put in the document preamble.
 
+\begin{verbatim}
+\forestset{
+fairly nice empty nodes/.style={
+        delay={where content={}{shape=coordinate,
+              for siblings={anchor=north}}{}},
+		for tree={s sep=4mm}}
+}
+\end{verbatim}
+
+\noindent  We can now specify this is style in the code of the above tree, as follows:
+
+\begin{lstlisting}[basicstyle=\ttfamily,basewidth=0.5em]
+\ex.
 \begin{forest}
-fairly nice empty nodes
+fairly nice empty nodes,
+for tree={inner sep=0, l=0}
+[[A] 
+	[[B] 
+		[[C][D]] 
+	] 
+]
+\end{forest}
+\end{lstlisting}
+
+\noindent The result is shown in \Next.
+
+\ex.
+\begin{forest}
+fairly nice empty nodes,
+for tree={inner sep=0, l=0}
 [ [A] 
 	[ [B] 
-		[ [C]
-			[D]  
-		] 
+		[[C][D]] 
 	] 
 ]
 \end{forest}
@@ -359,7 +390,7 @@ for tree={s sep=10mm, inner sep=0, l=0}
 
 \section{Arrows}
 
-Arrows are drawn using the \verb|\draw| command. This command takes two arguments, which specify the source and the target of the movement, respectively. The source and the target are defined by giving a name to the relevant nodes in the tree with the \texttt{name} command. In the example below, the target is named \texttt{tgt}, and the source \texttt{src}. The \verb|\draw| command tells \texttt{forest} to draw a line from \texttt{src} to \texttt{tgt}. Place the command following the final closing bracket of your tree.
+Arrows are drawn using the \verb|\draw| command. This command takes two arguments, which specify the source and the target of the movement, respectively. The source and the target are defined by giving a name to the relevant nodes in the tree with the \texttt{name} command. In the example below, the target is named \texttt{tgt}, and the source \texttt{src}. The \verb|\draw| command (which follows TikZ syntax) tells \texttt{forest} to draw a line from \texttt{src} to \texttt{tgt}. Place the command following the final closing bracket of your tree.
 
 The optional argument of \texttt{draw} is used to specify the placement of the arrow (up \texttt{[->]}, or down \texttt{[<-]}, both \texttt{[<->]}, or none \texttt{[-]}), and the line style (e.g. \texttt{dotted}). You can also specify where exactly at the source and target nodes the line should start and end by specifying this as an option with the \texttt{to} command; this is done using the option setting \texttt{south} for the bottom of the node, \texttt{north} for the top, \texttt{south west} for bottom left, etc.
 
@@ -376,7 +407,7 @@ for tree={s sep=10mm, inner sep=0, l=0}
 		]
 	]
 ]
-\draw[->] (src) to[out=south west,in=south] (tgt);
+\draw[->] (src) to[out=south west,in=south] node[pos=0.5,xshift=5mm]{(1)} (tgt);
 \end{forest}
 \end{lstlisting}
 
@@ -395,11 +426,17 @@ for tree={s sep=10mm, inner sep=0, l=0}
 \draw[->] (src) to[out=south west,in=south] (tgt);
 \end{forest}
 
-Do not forget the semicolon at the end of the \verb|\draw| command. Note that the \verb|\sout| command (to produce strikeout in the moved DP) requires the following line in your preamble: \verb|\usepackage[normalem]{ulem}|.
+Do not forget the semicolon at the end of the \verb|\draw| command. Note that the \verb|\sout| command (to produce strikeout in the moved DP) requires the following line in your preamble: \verb|\usepackage[normalem]{ulem}|. 
 
-The settings of the \texttt{in} and \texttt{out} options allow you to control the placement of  arrows. This is shown in \Next, where the arrow appears at the right hand side of the tree. 
+The default arrow tips are rather tiny, which may be improved upon by specifying the \texttt{stealth'} option in the \verb|\draw| command, as shown in \Next below. The use of this option requires that you add the following lines to your preamble:
 
-\pagebreak
+\begin{verbatim}
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+\end{verbatim}
+
+The settings of the \texttt{in} and \texttt{out} options allow you to control the placement of  arrows. This is shown in \Next, where the arrow appears at the right hand side of the tree, and with a curve that is the mirror image of the one in \Last. 
+
 \begin{lstlisting}[basicstyle=\ttfamily,basewidth=0.5em]
 \ex.\begin{forest} 
 for tree={s sep=10mm, inner sep=0, l=0}
@@ -409,7 +446,8 @@ for tree={s sep=10mm, inner sep=0, l=0}
 			[DP] 
 			[V$'$ [V] [\sout{DP},name=src]]]]
 	[DP,name=tgt]]
-\draw[->] (src) to[out=north east,in=south east] (tgt);
+\draw[->,>=stealth'] (src) to[out=north east,in=south east] 
+node[pos=0.5,xshift=14mm]{DP-raising} (tgt);
 \end{forest}
 \end{lstlisting}
 
@@ -425,9 +463,32 @@ for tree={s sep=10mm, inner sep=0, l=0}
 	]
 	[DP,name=tgt] 
 ]
-\draw[->] (src) to[out=north east,in=south east] (tgt);
+\draw[->,>=stealth'] (src) to[out=north east,in=south east] node[pos=0.5,xshift=14mm]{DP-raising} (tgt);
 \end{forest}
 
+The example also adds an annotation to the arrow, by adding a \texttt{node} preceding the target of the arrow. The option \texttt{pos} lets you position the annotation nearer the source (0) or the target (1) of the arrow (\texttt{pos=0.5} places it in the middle), the \texttt{xshift} option controls horizontal placement. The default is that the annotation will be placed on the line, so you will probably want to shift it a bit to the left or right to put it beside the line. Vertical spacing is controlled with \texttt{yshift}. If you specify more than one option, place commas between them.
+
+You can also add annotations near nodes in the tree, as in \Next below. In this case, the \verb|\draw| command is put following the closing bracket of the node where you want the annotation to appear, and the entire command needs to be enclosed within \verb|{ }|. The option \texttt{node[right]} controls whether the annotation appears to the left or the right of the node. The option \texttt{(.west)} controls the point of attachment or anchor of the annotation.
+
+\begin{lstlisting}[basicstyle=\ttfamily,basewidth=0.5em]
+\ex. \begin{forest}
+for tree={s sep=10mm, inner sep=0}
+[CP 
+[DP] { \draw (.west) node[left]{\textit{the subject} $\Leftarrow$}; }
+[TP]
+] { \draw (.east) node[right]{$\Rightarrow$ \textit{the clause}}; }
+\end{forest}
+
+\end{lstlisting}
+
+\ex. \begin{forest}
+for tree={s sep=10mm, inner sep=0}
+[CP [DP] { \draw (.west) node[left]{\textit{the subject} $\Leftarrow$}; }
+	[TP]
+] { \draw (.east) node[right]{$\Rightarrow$ \textit{the clause}}; }
+\end{forest}
+
+Notice how \texttt{forest} automatically moves the entire tree to the right to make room for the annotation on the left side of the tree.
 
 \section{Highlighting}
 
@@ -453,19 +514,31 @@ for tree={s sep=10mm, inner sep=1mm, l=0}
 		[V] [DP,draw,red] ]]
 \end{forest}
 
-A subtree can be highlighted with a box around it using the \texttt{draw} command, or with colors using the \texttt{for tree} command, as in the following example:\footnote{Observe that we first specify the edge of the DP-node to be violet at the tree level (i.e. for the DP subtree); if we did nothing else, the line connecting DP to its parent node would become violet as well. To avoid that, we next specify that the edge of the DP itself be black. Provided the latter command follows the former, black will overwrite violet on the line connecting DP and IP.}
+A subtree can be highlighted with a box, circle, or ellipse around it by specifying a TikZ command following the node label, as in the following example:
 
 \begin{lstlisting}[basicstyle=\ttfamily,basewidth=0.5em]
 \ex. \begin{forest}
 for tree={s sep=10mm, inner sep=0mm, l=0}
 [CP
-	[XP] [IP
-		[DP$_1$, for tree={color=violet, edge=violet}, edge=black
-			[D$'$ 
-				[D] [NP]
-			]
-		] 
-		[VP,tikz={\node [draw,fit to=tree]{};}
+[XP]
+[IP
+	[DP$_1$] 
+	[VP,tikz={\node [draw,ellipse,inner sep=-1pt,fit to=tree,
+		label=below:\emph{the lexical layer}] {};}
+		[t$_1$] 
+		[V$'$ [V] [DP$_2$]]
+]]]
+\end{forest}
+\end{lstlisting}
+
+\ex. 
+\begin{forest}
+for tree={s sep=10mm, inner sep=0mm, l=0}
+[CP
+	[XP] 
+	[IP
+		[DP$_1$] 
+		[VP, tikz={\node [draw,ellipse,inner sep=-1pt,fit to=tree,label=below:\emph{the lexical layer}] {};}
 			[t$_1$] 
 			[V$'$
 				[V] 	[DP$_2$] 
@@ -474,111 +547,8 @@ for tree={s sep=10mm, inner sep=0mm, l=0}
 	]
 ]
 \end{forest}
-\end{lstlisting}
 
-\ex. \begin{forest}
-for tree={s sep=10mm, inner sep=0, l=0}
-[CP
-	[XP] [IP
-		[DP$_1$, for tree={color=violet, edge=violet}, edge=black
-			[D$'$ 
-				[D] [NP]
-			]
-		] 
-		[VP,tikz={\node [draw,fit to=tree]{};}
-			[t$_1$] 
-			[V$'$
-				[V] 
-				[DP$_2$] 
-			]
-		]
-	]
-]
-\end{forest}
-
-The \texttt{color=violet} command specifies the color of the nodes, the \texttt{edge=violet} command the color of the branches, i.e. the lines connecting the nodes. Note how TikZ commands are preceded by \texttt{tikz} and placed inside \verb|{ }|.
-
-The square around the VP arises by telling TikZ to draw the smallest rectangle around the subtree dominated by VP. You can also highlight sections of the tree that are neither single nodes, nor a complete subtree (as in \Last). In this case, you need to highlight a \textit{nodewalk}. A nodewalk is a series of nodes that stand in some relation to a reference node. The relations are the following:
-
-\ex. \begin{tabular}[t]{lll}
-u & parent  \\
-p & previous sibling (i.e. sister on the left) \\
-n & next sibling (i.e. sister on the right) \\
-s & sister (only useful in binary trees)  \\
-1 & first child (i.e. leftmost daughter) \\
-2 & second child (i.e. second daughter node counting from left to right) \\
-l & last child (i.e. rightmost daughter) \\
-ll & rightmost daughter of the rightmost daughter\\
-F & first leaf (i.e. the leftmost terminal node) of the current node's descendants \\
-L & last leaf (i.e. the rightmost terminal node) of the current node's descendants\\
-N & next leaf (i.e. terminal node) in the linear order\\
-P & previous leaf (i.e. terminal node) in the linear order\\
-\end{tabular}
-
-The syntax for specifying a nodewalk can be inferred from the following example, where \verb|fit=| is followed by the nodewalk, i.e. a list of nodes, each preceded by ! and placed between brackets, starting with the reference node \verb|( )| (=BP in the tree; forest infers this from the place where you put the nodewalk in your tree), and followed by a list of related nodes (CP and DP in \Next).
-
-\begin{lstlisting}[basicstyle=\ttfamily,basewidth=0.5em]
-\ex.\begin{forest}
-for tree={s sep=10mm, inner sep=0, l=0}
-[AP
-	[\ldots]
-	[BP,tikz={\node 
-[draw,ellipse,inner sep=-2pt,red,rotate=45,fit=()(!l)(!ll)] {};}
-		[\ldots]
-		[CP
-			[\ldots] 
-			[DP
-				[\ldots]
-				[EP [\ldots] [FP]]
-			]
-		]
-	]
-]
-\end{forest}	
-\end{lstlisting}
-
-\ex.\begin{forest}
-for tree={s sep=10mm, inner sep=0, l=0}
-[AP
-	[\ldots]
-	[BP,tikz={\node [draw,ellipse,inner sep=-2pt,red,rotate=45,fit=()(!l)(!ll)] {};}
-		[\ldots]
-		[CP
-			[\ldots] 
-			[DP
-				[\ldots]
-				[EP
-					[\ldots]
-					[FP]
-				]
-			]
-		]
-	]
-]
-\end{forest}
-
-Other types of highlighting include annotations near nodes in the tree, as in \Next below. In this case, the \verb|\draw| command is put following the closing bracket of the node where you want the annotation to appear, and the entire command needs to be enclosed within \verb|{ }|. The option \texttt{node[right]} controls whether the annotation appears to the left or the right of the node. The option \texttt{(.west)} controls the point of attachment or anchor of the annotation.
-
-
-\begin{lstlisting}[basicstyle=\ttfamily,basewidth=0.5em]
-\ex. \begin{forest}
-for tree={s sep=10mm, inner sep=0, l=0}
-[NegP [Neg] 
-{\draw (.west) node[left]{\textit{negation} $\Leftarrow$}; }
-	[QP]
-] 
-{ \draw (.east) node[right]{$\Rightarrow$ \textit{adjective}}; }
-\end{forest}
-\end{lstlisting}
-
-\ex. \begin{forest}
-for tree={s sep=10mm, inner sep=0}
-[NegP [Neg] { \draw (.west) node[left]{\textit{negation} $\Leftarrow$}; }
-	[QP]
-] { \draw (.east) node[right]{$\Rightarrow$ \textit{adjective}}; }
-\end{forest}
-
-Notice how \texttt{forest} automatically moves the entire tree to the right to make room for the annotation on the left side of the tree.
+Note how TikZ commands are preceded by a comma following the node label, and placed inside \verb|{ }|.
 
 
 
