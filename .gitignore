@@ -81,14 +81,14 @@ Thumbs.db
 
 .texpadtmp
 
-.out
+*.out
 
-.toc
+*.toc
 
-.bbl
+*.bbl
 
-.aux
+*.aux
 
-.blg
+*.blg
 
 
