@@ -6,5 +6,5 @@
 \contentsline {section}{\numberline {5}Triangles}{7}{section.5}%
 \contentsline {section}{\numberline {6}Unlabelled nodes}{9}{section.6}%
 \contentsline {section}{\numberline {7}Horizontal alignment of terminals}{10}{section.7}%
-\contentsline {section}{\numberline {8}Arrows}{10}{section.8}%
-\contentsline {section}{\numberline {9}Highlighting}{13}{section.9}%
+\contentsline {section}{\numberline {8}Arrows}{11}{section.8}%
+\contentsline {section}{\numberline {9}Highlighting}{14}{section.9}%
